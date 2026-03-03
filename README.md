@@ -66,7 +66,6 @@ docker inspect -f '{{.LogPath}}' testtaskforkk-db-1
 ## Тесты
 
 Тесты используют реальный PostgreSQL (`settings.database_url`), поэтому перед запуском тестов БД должна быть доступна.
-Если это нежелательно, я пофикшу.
 
 Если запускаете через Docker Compose:
 
@@ -74,6 +73,15 @@ docker inspect -f '{{.LogPath}}' testtaskforkk-db-1
 docker compose up -d db
 uv run pytest
 ```
+
+### Что покрыто тестами
+
+1. Доменные сценарии `AuthService`:
+успешные `register` и `login`, дубликаты пользователя, невалидные credentials, password policy, reset flow (cooldown/одноразовость/инвалидирование старого токена), reset для неизвестного email.
+2. Интеграционные сценарии GraphQL:
+`register -> login -> me`, `requestPasswordReset -> resetPassword -> login(new password)`, а также проверка, что вход со старым паролем после reset не работает.
+3. Интеграция репозитория:
+создание пользователя и чтение через `UserRepository` на реальной БД.
 
 ## API доки
 
