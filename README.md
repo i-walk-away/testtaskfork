@@ -66,15 +66,15 @@ docker inspect -f '{{.LogPath}}' testtaskforkk-db-1
 ## Тесты
 
 Тесты используют реальный PostgreSQL (`settings.database_url`), поэтому перед запуском тестов БД должна быть доступна.
+Если это нежелательно, я пофикшу.
 
-Если запускаете через Docker Compose:
-
+Запуск: 
 ```bash
 docker compose up -d db
 uv run pytest
 ```
 
-### Что покрыто тестами
+### Покрытие
 
 1. Доменные сценарии `AuthService`:
 успешные `register` и `login`, дубликаты пользователя, невалидные credentials, password policy, reset flow (cooldown/одноразовость/инвалидирование старого токена), reset для неизвестного email.
