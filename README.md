@@ -7,9 +7,8 @@
 - Python 3.14
 - FastAPI
 - Strawberry GraphQL
-- PostgreSQL
+- PostgreSQL (async)
 - SQLAlchemy (async)
-- asyncpg
 - Docker Compose
 
 ## Почему выбран этот стек
