@@ -10,6 +10,7 @@
 - PostgreSQL (async)
 - SQLAlchemy (async)
 - Docker Compose
+- ruff (линтер)
 
 ## Почему выбран этот стек
 
