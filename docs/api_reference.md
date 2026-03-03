@@ -1,33 +1,34 @@
-# API Reference (GraphQL)
+# API-референс (GraphQL)
 
-## Base Endpoint
+## Общая информация
 
-- URL: `http://localhost:8000/api/v1/graphql`
-- Method: `POST`
-- Body format: `{"query": "...", "variables": {...}}`
+- Endpoint: `http://localhost:8000/api/v1/graphql`
+- Метод: `POST`
+- Формат тела: `{"query": "...", "variables": {...}}`
 - Content-Type: `application/json`
 
-For `me` query you must pass:
+Важно:
 
-- `Authorization: Bearer <access_token>`
+- Все бизнес-операции выполняются через один GraphQL endpoint.
+- Для запроса `me` обязателен заголовок `Authorization: Bearer <access_token>`.
 
-## Operations
+## Операции
 
-### `register(inputData: RegisterInput!) -> TokenOutput`
+### 1. Регистрация
 
-Creates a user and returns JWT access token.
+Операция: `register(inputData: RegisterInput!) -> TokenOutput`
 
-Input (`RegisterInput`):
+Входные параметры (`RegisterInput`):
 
 - `username: String!`
 - `email: String!`
 - `password: String!`
 
-Response (`TokenOutput`):
+Успешный ответ (`TokenOutput`):
 
 - `accessToken: String!`
 
-Possible error messages:
+Возможные ошибки:
 
 - `username or email already exists`
 - `password must be at least 8 characters`
@@ -36,84 +37,7 @@ Possible error messages:
 - `password must contain at least one digit`
 - `password must contain at least one special character`
 
-### `login(inputData: LoginInput!) -> TokenOutput`
-
-Authenticates user and returns JWT access token.
-
-Input (`LoginInput`):
-
-- `username: String!`
-- `password: String!`
-
-Response (`TokenOutput`):
-
-- `accessToken: String!`
-
-Possible error messages:
-
-- `invalid credentials`
-
-### `me -> UserOutput`
-
-Returns current authenticated user.
-
-Headers:
-
-- `Authorization: Bearer <access_token>`
-
-Response (`UserOutput`):
-
-- `id: Int!`
-- `username: String!`
-- `email: String!`
-
-Possible error messages:
-
-- `authorization header is required`
-- `invalid token`
-- `user not found`
-
-### `requestPasswordReset(inputData: RequestPasswordResetInput!) -> ResetTokenOutput`
-
-Generates password reset token.
-
-Input (`RequestPasswordResetInput`):
-
-- `email: String!`
-
-Response (`ResetTokenOutput`):
-
-- `resetToken: String!`
-
-Possible error messages:
-
-- `try again later`
-
-### `resetPassword(inputData: ConfirmPasswordResetInput!) -> Boolean`
-
-Resets password by reset token.
-
-Input (`ConfirmPasswordResetInput`):
-
-- `token: String!`
-- `newPassword: String!`
-
-Response:
-
-- `true` on success
-
-Possible error messages:
-
-- `invalid or expired token`
-- `password must be at least 8 characters`
-- `password must contain at least one uppercase letter`
-- `password must contain at least one lowercase letter`
-- `password must contain at least one digit`
-- `password must contain at least one special character`
-
-## Examples
-
-### Register
+Пример GraphQL запроса:
 
 ```graphql
 mutation Register($inputData: RegisterInput!) {
@@ -122,6 +46,8 @@ mutation Register($inputData: RegisterInput!) {
   }
 }
 ```
+
+Пример HTTP payload:
 
 ```json
 {
@@ -136,7 +62,24 @@ mutation Register($inputData: RegisterInput!) {
 }
 ```
 
-### Login
+### 2. Авторизация
+
+Операция: `login(inputData: LoginInput!) -> TokenOutput`
+
+Входные параметры (`LoginInput`):
+
+- `username: String!`
+- `password: String!`
+
+Успешный ответ (`TokenOutput`):
+
+- `accessToken: String!`
+
+Возможные ошибки:
+
+- `invalid credentials`
+
+Пример GraphQL запроса:
 
 ```graphql
 mutation Login($inputData: LoginInput!) {
@@ -146,7 +89,41 @@ mutation Login($inputData: LoginInput!) {
 }
 ```
 
-### Me
+Пример HTTP payload:
+
+```json
+{
+  "query": "mutation Login($inputData: LoginInput!) { login(inputData: $inputData) { accessToken } }",
+  "variables": {
+    "inputData": {
+      "username": "alex",
+      "password": "Verystrongpass1!"
+    }
+  }
+}
+```
+
+### 3. Профиль текущего пользователя
+
+Операция: `me -> UserOutput`
+
+Требования:
+
+- заголовок `Authorization: Bearer <access_token>`
+
+Успешный ответ (`UserOutput`):
+
+- `id: Int!`
+- `username: String!`
+- `email: String!`
+
+Возможные ошибки:
+
+- `authorization header is required`
+- `invalid token`
+- `user not found`
+
+Пример GraphQL запроса:
 
 ```graphql
 query {
@@ -158,7 +135,31 @@ query {
 }
 ```
 
-### Request Password Reset
+Пример HTTP payload:
+
+```json
+{
+  "query": "query { me { id username email } }"
+}
+```
+
+### 4. Запрос на сброс пароля
+
+Операция: `requestPasswordReset(inputData: RequestPasswordResetInput!) -> ResetTokenOutput`
+
+Входные параметры (`RequestPasswordResetInput`):
+
+- `email: String!`
+
+Успешный ответ (`ResetTokenOutput`):
+
+- `resetToken: String!`
+
+Возможные ошибки:
+
+- `try again later`
+
+Пример GraphQL запроса:
 
 ```graphql
 mutation RequestPasswordReset($inputData: RequestPasswordResetInput!) {
@@ -168,10 +169,59 @@ mutation RequestPasswordReset($inputData: RequestPasswordResetInput!) {
 }
 ```
 
-### Reset Password
+Пример HTTP payload:
+
+```json
+{
+  "query": "mutation RequestPasswordReset($inputData: RequestPasswordResetInput!) { requestPasswordReset(inputData: $inputData) { resetToken } }",
+  "variables": {
+    "inputData": {
+      "email": "alex@example.com"
+    }
+  }
+}
+```
+
+### 5. Подтверждение сброса пароля
+
+Операция: `resetPassword(inputData: ConfirmPasswordResetInput!) -> Boolean`
+
+Входные параметры (`ConfirmPasswordResetInput`):
+
+- `token: String!`
+- `newPassword: String!`
+
+Успешный ответ:
+
+- `true`
+
+Возможные ошибки:
+
+- `invalid or expired token`
+- `password must be at least 8 characters`
+- `password must contain at least one uppercase letter`
+- `password must contain at least one lowercase letter`
+- `password must contain at least one digit`
+- `password must contain at least one special character`
+
+Пример GraphQL запроса:
 
 ```graphql
 mutation ResetPassword($inputData: ConfirmPasswordResetInput!) {
   resetPassword(inputData: $inputData)
+}
+```
+
+Пример HTTP payload:
+
+```json
+{
+  "query": "mutation ResetPassword($inputData: ConfirmPasswordResetInput!) { resetPassword(inputData: $inputData) }",
+  "variables": {
+    "inputData": {
+      "token": "<reset_token>",
+      "newPassword": "Newstrongpass2!"
+    }
+  }
 }
 ```
