@@ -1,5 +1,5 @@
-from datetime import UTC, datetime, timedelta
 import re
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.exc import IntegrityError
 
@@ -27,10 +27,10 @@ class AuthService:
     """
 
     def __init__(
-        self,
-        user_repository: UserRepository,
-        reset_repository: PasswordResetRepository,
-        auth_manager: AuthManager,
+            self,
+            user_repository: UserRepository,
+            reset_repository: PasswordResetRepository,
+            auth_manager: AuthManager,
     ) -> None:
         self._user_repository = user_repository
         self._reset_repository = reset_repository

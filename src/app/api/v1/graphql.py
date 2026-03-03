@@ -10,11 +10,8 @@ from src.app.api.v1.contracts.auth_graphql import (
     TokenOutput,
     UserOutput,
 )
-from src.app.core.dependencies.services.auth import (
-    get_auth_service,
-    get_auth_query_service,
-)
 from src.app.core.dependencies.security.user import get_bearer_token
+from src.app.core.dependencies.services.auth import (get_auth_query_service, get_auth_service)
 
 
 @strawberry.type
@@ -73,9 +70,9 @@ class Mutation:
 
     @strawberry.mutation
     async def request_password_reset(
-        self,
-        info: strawberry.Info,
-        input_data: RequestPasswordResetInput,
+            self,
+            info: strawberry.Info,
+            input_data: RequestPasswordResetInput,
     ) -> ResetTokenOutput:
         """
         Issue password reset token.

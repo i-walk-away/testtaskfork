@@ -1,6 +1,6 @@
 # Auth Challenge Solution
-Модуль аутентификации в моей художественной реализации
 
+Модуль аутентификации в моей художественной реализации
 
 ## Используемый стек
 
@@ -76,49 +76,9 @@ uv run pytest
 
 ## API доки
 
-Сразу скажу, что в автоматически генерируемой swagger документации от FastAPI`localhost:8000/docs` не видно auth
-операций. В проекте бизнес API реаизован через GraphQL, поэтому в `http://localhost:8000/docs` видны только
-HTTP-обертки:
+Полная спецификация API находится в отдельном файле:
 
-- `GET /api/v1/graphql`
-- `POST /api/v1/graphql`
-- `GET /health`
-
-Сами auth-операции (`register`, `login`, `me`, `requestPasswordReset`, `resetPassword`) описаны в GraphQL schema.
-
-### Где смотреть и как вызывать GraphQL
-
-- Endpoint: `http://localhost:8000/api/v1/graphql`
-- Метод: `POST`
-- Формат тела: `{"query": "...", "variables": {...}}`
-
-Примеры операций:
-
-```graphql
-mutation Register($inputData: RegisterInput!) {
-  register(inputData: $inputData) {
-    accessToken
-  }
-}
-```
-
-```graphql
-mutation Login($inputData: LoginInput!) {
-  login(inputData: $inputData) {
-    accessToken
-  }
-}
-```
-
-```graphql
-query {
-  me {
-    id
-    username
-    email
-  }
-}
-```
+- [docs/api_reference.md](docs/api_reference.md)
 
 ## Архитектура
 
@@ -137,35 +97,41 @@ query {
 
 1. API слой (`src/app/api/v1/*`)
 
-- Файлы: [src/app/api/v1/__init__.py](src/app/api/v1/__init__.py), [src/app/api/v1/graphql.py](src/app/api/v1/graphql.py), [src/app/api/v1/contracts/auth_graphql.py](src/app/api/v1/contracts/auth_graphql.py)
+- Файлы: [src/app/api/v1/__init
+  __.py](src/app/api/v1/__init__.py), [src/app/api/v1/graphql.py](src/app/api/v1/graphql.py), [src/app/api/v1/contracts/auth_graphql.py](src/app/api/v1/contracts/auth_graphql.py)
 - Роль: принять GraphQL-запрос, провалидировать контракт входа/выхода, вызвать сервис.
 - бизнес-правил здесь нет
 
 2. Domain services (`src/app/domain/services/*`)
 
-- Файлы: [src/app/domain/services/auth_service.py](src/app/domain/services/auth_service.py), [src/app/domain/services/auth_query_service.py](src/app/domain/services/auth_query_service.py)
+-
+Файлы: [src/app/domain/services/auth_service.py](src/app/domain/services/auth_service.py), [src/app/domain/services/auth_query_service.py](src/app/domain/services/auth_query_service.py)
 - Роль: бизнес-логика.
 - CQRS command side: `AuthService` (`register`, `login`, `request_password_reset`, `reset_password`)
 - CQRS query side: `AuthQueryService` (`get_me`)
 
 3. Repositories (`src/app/domain/repositories/*`)
 
-- Файлы: [src/app/domain/repositories/user_repository.py](src/app/domain/repositories/user_repository.py), [src/app/domain/repositories/password_reset_repository.py](src/app/domain/repositories/password_reset_repository.py)
+-
+Файлы: [src/app/domain/repositories/user_repository.py](src/app/domain/repositories/user_repository.py), [src/app/domain/repositories/password_reset_repository.py](src/app/domain/repositories/password_reset_repository.py)
 - Роль: изолировать SQLAlchemy/БД доступ от бизнес-логики.
 - Модели БД: `src/app/domain/models/db/*`.
 
 4. Core infrastructure (`src/app/core/*`)
 
 - DB wiring: [src/app/core/dependencies/db.py](src/app/core/dependencies/db.py)
-- repository factories: [src/app/core/dependencies/repositories/user.py](src/app/core/dependencies/repositories/user.py), [src/app/core/dependencies/repositories/password_reset.py](src/app/core/dependencies/repositories/password_reset.py)
+- repository
+  factories: [src/app/core/dependencies/repositories/user.py](src/app/core/dependencies/repositories/user.py), [src/app/core/dependencies/repositories/password_reset.py](src/app/core/dependencies/repositories/password_reset.py)
 - service factories: [src/app/core/dependencies/services/auth.py](src/app/core/dependencies/services/auth.py)
-- security dependencies: [src/app/core/dependencies/security/auth_manager.py](src/app/core/dependencies/security/auth_manager.py), [src/app/core/dependencies/security/crypt_context.py](src/app/core/dependencies/security/crypt_context.py), [src/app/core/dependencies/security/user.py](src/app/core/dependencies/security/user.py)
+- security
+  dependencies: [src/app/core/dependencies/security/auth_manager.py](src/app/core/dependencies/security/auth_manager.py), [src/app/core/dependencies/security/crypt_context.py](src/app/core/dependencies/security/crypt_context.py), [src/app/core/dependencies/security/user.py](src/app/core/dependencies/security/user.py)
 - security primitives: [src/app/core/security/auth_manager.py](src/app/core/security/auth_manager.py)
 - domain exceptions: [src/app/core/exceptions/auth_exc.py](src/app/core/exceptions/auth_exc.py)
 
 5. Composition root и entrypoint
 
-- Composition root: [src/app/bootstrap.py](src/app/bootstrap.py) собирает приложение, middleware, lifespan и обработчики ошибок.
+- Composition root: [src/app/bootstrap.py](src/app/bootstrap.py) собирает приложение, middleware, lifespan и обработчики
+  ошибок.
 - Entry point: [src/main.py](src/main.py) экспортирует `app` для `uvicorn`.
 
 ### Поток запроса
@@ -189,8 +155,7 @@ query {
 
 ### Где в решении IaC
 
-- [docker-compose.yml](docker-compose.yml) 
-
+- [docker-compose.yml](docker-compose.yml)
 
 ## Ключевые правила домена
 
@@ -214,7 +179,6 @@ query {
 
 - Плюс: проще интеграция и ручная проверка.
 - Минус: контракт менее строгий, чем protobuf/gRPC.
-
 
 ## Какие расширения можно добавить благодаря особенностям построенной архитекткры
 
@@ -245,4 +209,4 @@ flowchart TD
 
 ## Использование AI
 
-Использовал ИИ для проверки моего кода на соответствие требованиям. 
+Использовал ИИ для проверки моего кода на соответствие требованиям и для генерации api reference

@@ -14,7 +14,6 @@ from src.app.domain.models.db.base import Base
 from src.app.domain.models.db.password_reset_token import PasswordResetToken
 from src.app.domain.models.db.user import User
 
-
 logger = logging.getLogger(name="auth_challenge")
 logging.basicConfig(level=logging.INFO)
 
@@ -59,8 +58,8 @@ def register_middleware(app: FastAPI) -> None:
 
     @app.middleware("http")
     async def db_session_middleware(
-        request: Request,
-        call_next: Callable[[Request], Awaitable[Response]],
+            request: Request,
+            call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         """
         Attach database session per request.
@@ -83,8 +82,8 @@ def register_middleware(app: FastAPI) -> None:
 
     @app.middleware("http")
     async def logging_middleware(
-        request: Request,
-        call_next: Callable[[Request], Awaitable[Response]],
+            request: Request,
+            call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         """
         Log request latency for basic observability.

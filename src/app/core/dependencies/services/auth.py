@@ -3,8 +3,8 @@ from fastapi import Request
 from src.app.core.dependencies.repositories.password_reset import get_password_reset_repository
 from src.app.core.dependencies.repositories.user import get_user_repository
 from src.app.core.dependencies.security.auth_manager import get_auth_manager
-from src.app.domain.services.auth_service import AuthService
 from src.app.domain.services.auth_query_service import AuthQueryService
+from src.app.domain.services.auth_service import AuthService
 
 
 def get_auth_service(request: Request) -> AuthService:
